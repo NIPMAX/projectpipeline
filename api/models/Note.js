@@ -21,10 +21,11 @@ module.exports = {
 
       type: 'string'
     },
-    // attachment: {
 
-    //   type: 'string'
-    // },
+    taskAttachment: {
+
+      type: 'string'
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -37,7 +38,7 @@ module.exports = {
 
     task: {
       model: 'task',
-    
+
     },
 
 

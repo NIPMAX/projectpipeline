@@ -5,7 +5,7 @@ module.exports = {
 
 
   description: '',
-  files: ['attachment'],
+  files: ['taskAttachment'],
 
 
   inputs: {
@@ -28,10 +28,10 @@ module.exports = {
       type: 'string'
     },
 
-    // taskAttachment: {
+    taskAttachment: {
 
-    //   type: 'ref'
-    // },
+      type: 'ref'
+    },
 
   },
 
@@ -56,94 +56,99 @@ module.exports = {
       console.log('inputs');
       console.log(inputs.id);
 
-      // var image_url = '';
+      var image_url = '';
 
+      if (inputs.taskAttachment == '') {
 
+        image_url == '0';
 
-      // // Upload the image.
-      // var files = await sails.helpers.flow.simultaneously(
-      //   [async () => await sails.uploadOne(inputs.taskAttachment, { maxBytes: 30000000, maxTimeToBuffer: 30000 }),
-      //   ]
+      } else {
 
-      // ).intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-      //   .intercept((err) => new Error('The photo upload failed: ' + util.inspect(err)));
+        // Upload the image.
+        var files = await sails.helpers.flow.simultaneously(
+          [async () => await sails.uploadOne(inputs.taskAttachment, { maxBytes: 30000000, maxTimeToBuffer: 30000 }),
+          ]
 
-      // console.log("Files display here");
-      // console.log(files);
+        ).intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+          .intercept((err) => new Error('The photo upload failed: ' + util.inspect(err)));
 
-      // // console.log(files[0].extra.secure_url); if (inputs.photo1._files.length>0) {
-      // for (var key in files) {
-      //   // console.log(files[key]);
-      //   if (files[key] !== undefined) {
-      //     if (files[key].field == 'taskAttachment') {
-      //       image_url = files[key].extra.secure_url;
-      //     }
-      //   }
+        console.log("Files display here");
+        console.log(files);
 
-      // }
+        // console.log(files[0].extra.secure_url); if (inputs.photo1._files.length>0) {
+        for (var key in files) {
+          // console.log(files[key]);
+          if (files[key] !== undefined) {
+            if (files[key].field == 'taskAttachment') {
+              image_url = files[key].extra.secure_url;
+            }
+          }
+        }
+
+      }
 
 
       var createNote = await Note.create({
         "header": inputs.header,
         "description": inputs.description,
         "task": inputs.noteId,
-        // "attachment":image_url,s
+        "taskAttachment": image_url,
 
       }).fetch();
 
       console.log('Done');
-    
-    }else{
 
-    var findnote = await Note.findOne({ id: inputs.id });
-    
-    console.log('Selected note');
-    console.log(findnote);
+    } else {
 
-    // var image_url = '';
+      var findnote = await Note.findOne({ id: inputs.id });
 
+      console.log('Selected note');
+      console.log(findnote);
 
-
-    // // Upload the image.
-    // var files = await sails.helpers.flow.simultaneously(
-    //   [async () => await sails.uploadOne(inputs.taskAttachment, { maxBytes: 30000000, maxTimeToBuffer: 30000 }),
-    //   ]
-
-    // ).intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
-    //   .intercept((err) => new Error('The photo upload failed: ' + util.inspect(err)));
-
-    // console.log("Files display here");
-    // console.log(files);
-
-    // // console.log(files[0].extra.secure_url); if (inputs.photo1._files.length>0) {
-    // for (var key in files) {
-    //   // console.log(files[key]);
-    //   if (files[key] !== undefined) {
-    //     if (files[key].field == 'taskAttachment') {
-    //       image_url = files[key].extra.secure_url;
-    //     }
-    //   }
-
-    // }
+      var image_url = '';
 
 
-        var createNote = await Note.update({ id: inputs.id })
+
+      // Upload the image.
+      var files = await sails.helpers.flow.simultaneously(
+        [async () => await sails.uploadOne(inputs.taskAttachment, { maxBytes: 30000000, maxTimeToBuffer: 30000 }),
+        ]
+
+      ).intercept('E_EXCEEDS_UPLOAD_LIMIT', 'tooBig')
+        .intercept((err) => new Error('The photo upload failed: ' + util.inspect(err)));
+
+      console.log("Files display here");
+      console.log(files);
+
+      // console.log(files[0].extra.secure_url); if (inputs.photo1._files.length>0) {
+      for (var key in files) {
+        // console.log(files[key]);
+        if (files[key] !== undefined) {
+          if (files[key].field == 'taskAttachment') {
+            image_url = files[key].extra.secure_url;
+          }
+        }
+
+      }
+
+
+      var createNote = await Note.update({ id: inputs.id })
         .set({
           "header": inputs.header,
           "description": inputs.description,
           "task": inputs.noteId,
-          // "attachment":image_url,
+          "taskAttachment": image_url,
 
         }).fetch();
 
-      }
-      console.log('create note');
-      console.log(createNote);
-
-
-    
-      return exits.success({ note: createNote });
     }
+    console.log('create note');
+    console.log(createNote);
+
+
+
+    return exits.success({ note: createNote });
+  }
 
 
 

@@ -54,9 +54,9 @@ module.exports = {
 
       var note = await Note.find({
         where: { task: inputs.id },
-        select: ['header','description'],
+        select: ['header','description','taskAttachment'],
       });
-
+ 
       var selectedNote = await Note.findOne({ id: inputs.id });
       console.log('task Manager');
       console.log(task.project.id);

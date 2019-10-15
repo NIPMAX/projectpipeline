@@ -319,6 +319,7 @@ parasails.registerPage('single-task', {
       this.deleteTaskModelOpen = false;
       this.cloudError = '';
     },
+    
     changeFileInput: function (files) {
 
       if (files.length !== 1 && !this.formData.taskAttachment) {

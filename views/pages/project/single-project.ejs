@@ -1,6 +1,6 @@
 <div id="single-project" v-cloak>
 
-  <modal class="modal fade" v-if="completeModelOpen" @close="closeDeleteModal()" v-cloak>
+  <modal class="modal fade" v-if="completeModelOpen" @close="closeCompleteModal()" v-cloak>
     <div class="modal-header">
       <h5 class="modal-title">Complete this task</h5>
       <button type="button" class="modal-close-button" data-dismiss="modal" aria-label="Close"
@@ -14,6 +14,9 @@
       <div class="modal-footer flex-row-reverse justify-content-between">
         <ajax-button type="submit" :syncing="syncing" class=" btn-danger"
           style="margin-bottom: 30px; margin-right: 30px;">Yes</ajax-button>
+
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"
+          style="margin-bottom: 30px; margin-left: 30px;">No</button>
 
         <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-bottom: 30px; margin-left: 30px;">No</button> -->
       </div>
@@ -52,6 +55,38 @@
       <div class="modal-body">
         Are you sure you want to remove this Project!
       </div>
+      <div class="modal-footer flex-row-reverse justify-content-between">
+        <ajax-button type="submit" :syncing="syncing" class=" btn-danger"
+          style="margin-bottom: 30px; margin-right: 30px;">Yes</ajax-button>
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+          style="margin-bottom: 30px; margin-left: 30px;">No</button>
+      </div>
+    </ajax-form>
+  </modal>
+
+  <modal class="modal fade" v-if="statusChangeModelOpen" @close="closeStatusModal()" v-cloak>
+    <div class="modal-header">
+      <h5 class="modal-title">Change status!</h5>
+      <button type="button" class="modal-close-button" data-dismiss="modal" aria-label="Close"
+        style="margin-right: 10px; margin-top: 5px;"></button>
+    </div>
+    <ajax-form action="makechangestatus" :syncing.sync="syncing" :cloud-error.sync="cloudError"
+      :handle-parsing="handleParsingChangeStatusForm" @submitted="submittedChangeStatusForm()">
+
+      <div class="form-group row" style="margin-top: 20px;">
+        <label>Do you need to change status!</label>
+        <select class="edit-field form-control" name="make" :class="[formErrors.make ? 'is-invalid' : '']"
+          v-model.trim="formData.status">
+          <option value="" selected>Chnage Status</option>
+          <option value="Done">100%</option>
+          <option value="WorkingOnIt">75%</option>
+          <option value="HalfDone">50%</option>
+          <option value="Beginning">25%</option>
+        </select>
+        <div class="invalid-feedback" v-if="formErrors.make">Please select type.</div>
+      </div>
+
       <div class="modal-footer flex-row-reverse justify-content-between">
         <ajax-button type="submit" :syncing="syncing" class=" btn-danger"
           style="margin-bottom: 30px; margin-right: 30px;">Yes</ajax-button>
@@ -244,13 +279,15 @@
             <div class="page-header">
               <h1 v-if="taskName" @click="editProjectName(project.id)">{{project.name}}</h1>
 
-              <font style=" font-size: 20px; color: green"><i v-if="project.status == '100%'"
+              <font style=" font-size: 20px; color: green"><i v-if="project.status == 'Done'"
                   class="fa fa-check-circle-o">&nbsp;Done</i></font>
-              <font style=" font-size: 20px; color: green"><i v-if="project.status == '75%'"
-                  class="fa fa-exclamation-triangle">&nbsp;This project is upto Done!</i></font>
-              <font style=" font-size: 20px; color: sandybrown"><i v-if="project.status == '10%'"
+              <font style=" font-size: 20px; color: sandybrown"><i v-if="project.status == 'HalfDone'"
+                  class="fa fa-exclamation-triangle">&nbsp;This project is upto Done</i></font>
+              <font style=" font-size: 20px; color: sandybrown"><i v-if="project.status == 'WorkingOnIt'"
+                  class="fa fa-exclamation-triangle">&nbsp;This project is upto Done</i></font>
+              <font style=" font-size: 20px; color: sandybrown"><i v-if="project.status == 'Beginning'"
                   class="fa fa-exclamation-triangle">&nbsp;This project is at the Beginning!</i></font>
-
+              <br>
               <div v-if="taskNameTxt">
                 <ajax-form action="editprojectname" :syncing.sync="syncing" :cloud-error.sync="cloudError"
                   @submitted="submittedChangeName($event)" :handle-parsing="handleParsingChangeName">
@@ -267,15 +304,21 @@
               </div>
               <br>
 
-
-              <button @click="removeProject(project.id)" style="margin-left: 300px;" type="button"
-                class="btn btn-outline-success"><i class="fa fa-check"></i> &nbsp;Mark as done</button>
-
-              <button @click="removeProject(project.id)" style="margin-left: 00px;" type="button"
-                class="btn btn-outline-danger"><i class="fa fa-trash"></i> &nbsp;Delete this Project</button>
+              <div>
+                <div class="row border rounded border-primary"
+                  style="margin-left: 2px; margin-right: 3px; padding: 10px 0px;">
+                  <div class="col mr-auto text-right">
+                    <button @click="makeChangeProjectStatus(project.id)" type="button"
+                      class="btn btn-outline-success"><i class="fa fa-check"></i> &nbsp;Mark as done</button>
+                    <button @click="removeProject(project.id)" type="button" class="btn btn-outline-danger"><i
+                        class="fa fa-trash"></i> &nbsp;Delete this Project</button>
+                  </div>
+                </div>
+              </div>
               <hr><br>
               <br>
-              <p class="lead" v-if="projectDetailsLbl" @click="editProjectDetails(project.id)">{{project.description}}
+              <p class="lead" v-if="projectDetailsLbl" @click="editProjectDetails(project.id)">
+                {{project.description}}
               </p>
 
               <div v-if="projectDetailsTxt">
@@ -295,18 +338,15 @@
                 </ajax-form>
                 <br>
               </div>
-
-              <div class="d-flex align-items-center">
-                <button class="btn btn-round" data-toggle="modal" data-target="#user-manage-modal">
-                  <i class="material-icons">add</i>
-                </button>
-              </div>
               <div>
                 <div class="progress" v-if="project.status == 'Done'">
                   <div class="progress-bar bg-success" style="width:100%;"></div>
                 </div>
                 <div class="progress" v-if="project.status == 'WorkingOnIt'">
                   <div class="progress-bar bg-warning" style="width:70%;"></div>
+                </div>
+                <div class="progress" v-if="project.status == 'HalfDone'">
+                  <div class="progress-bar bg-warning" style="width:50%;"></div>
                 </div>
                 <div class="progress" v-if="project.status == 'Beginning'">
                   <div class="progress-bar bg-danger" style="width:5%;"></div>
@@ -453,66 +493,6 @@
                   <!--end of content list body-->
                 </div>
                 <!--end of content list-->
-                <div class="content-list" data-filter-list="content-list-body">
-                  <div class="row content-list-head">
-                    <div class="col-auto">
-                      <h3>Notes</h3>
-                      <button class="btn btn-round" data-toggle="modal" data-target="#note-add-modal">
-                        <i class="material-icons">add</i>
-                      </button>
-                    </div>
-                    <form class="col-md-auto">
-                      <div class="input-group input-group-round">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">
-                            <i class="material-icons">filter_list</i>
-                          </span>
-                        </div>
-                        <input type="search" class="form-control filter-list-input" placeholder="Filter notes"
-                          aria-label="Filter notes">
-                      </div>
-                    </form>
-                  </div>
-                  <!--end of content list head-->
-                  <div class="content-list-body">
-
-                    <div class="card card-note">
-                      <div class="card-header">
-                        <div class="media align-items-center">
-                          <!-- <img alt="Peggy Brown" src="assets/img/avatar-female-2.jpg" class="avatar"
-                            data-toggle="tooltip" data-title="Peggy Brown" data-filter-by="alt" /> -->
-                          <div class="media-body">
-                            <h6 class="mb-0" data-filter-by="text">First meeting notes</h6>
-                          </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                          <span data-filter-by="text">Just now</span>
-                          <div class="ml-1 dropdown card-options">
-                            <button class="btn-options" type="button" id="note-dropdown-button-1" data-toggle="dropdown"
-                              aria-haspopup="true" aria-expanded="false">
-                              <i class="material-icons">more_vert</i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="#">Edit</a>
-                              <a class="dropdown-item text-danger" href="#">Delete</a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="card-body" data-filter-by="text">
-                        <p>Here&#39;s a quick rundown of companies the client expressed interest in on our call this
-                          morning:</p>
-                        <ul>
-                          <li><a href="#">Commonwealth Bank of Australia</a> for the bright, positive color scheme</li>
-                          <li><a href="#">Bupa Health Insurance</a> for the adaptability of their logo around the
-                            site&#39;s layout</li>
-                          <li><a href="#">OPSM</a> again for the color scheme, this time for the softer pallette</li>
-                        </ul>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
               <!--end of tab-->
               <div class="tab-pane fade" id="files" role="tabpanel" data-filter-list="dropzone-previews">
@@ -587,7 +567,7 @@
                       <span class="dz-message">Drop files here or click here to upload</span>
                     </form>
 
-                    <ul class="list-group list-group-activity dropzone-previews flex-column-reverse" >
+                    <ul class="list-group list-group-activity dropzone-previews flex-column-reverse">
 
 
                       <li class="list-group-item" v-for="attachment in attachment">
@@ -602,11 +582,11 @@
                               <!-- <img   :src="attachment.facilityImg" class="avatar"
                                 data-title="David Whittaker" data-toggle="tooltip" data-filter-by="data-title" /> -->
 
-                                <img class="img-fluid"
-                                :src="attachment.attachment" style="width: 40px; height: 40px; border-radius: 50%" />
+                              <img class="img-fluid" :src="attachment.attachment"
+                                style="width: 40px; height: 40px; border-radius: 50%" />
                             </li>
                           </ul>
-                          <div class="media-body d-flex justify-content-between align-items-center" >
+                          <div class="media-body d-flex justify-content-between align-items-center">
                             <div>
                               <a href="#" data-filter-by="text">{{attachment.name}}</a>
                               <br>
@@ -798,7 +778,7 @@
                 <!--end of content list-->
               </div>
             </div>
-     
+
 
             <!-- <form class="modal fade" id="task-edit-modal" tabindex="-1" aria-hidden="true"> -->
             <ajax-form action="newattchment" :syncing.sync="syncing" :cloud-error.sync="cloudError"
@@ -828,7 +808,8 @@
                         <div class="form-group row align-items-center">
                           <label class="col-3">Name</label>
                           <input class="form-control col" type="text" placeholder="File name" name="task-name"
-                            :class="[formErrors.attachmentName ? 'is-invalid' : '']" v-model.trim="formData.attachmentName" required />
+                            :class="[formErrors.attachmentName ? 'is-invalid' : '']"
+                            v-model.trim="formData.attachmentName" required />
                         </div>
                         <div class="form-group row">
                           <label class="col-3">Attachment</label>
@@ -901,7 +882,7 @@
                         </div>
                         <div class="form-group row">
                           <label class="col-3">Description</label>
-                          <textarea class="form-control col" rows="3" placeholder="Task tDescription"
+                          <textarea class="form-control col" rows="3" placeholder="Task Description"
                             name="task-description" :class="[formErrors.tDescription ? 'is-invalid' : '']"
                             v-model.trim="formData.tDescription" required></textarea>
                         </div>
@@ -998,7 +979,8 @@
                       <span data-filter-by="text">4 days ago</span>
                     </div>
                     <div class="chat-item-body" data-filter-by="text">
-                      <p>Hey guys, just kicking things off here in the chat window. Hope you&#39;re all ready to tackle
+                      <p>Hey guys, just kicking things off here in the chat window. Hope you&#39;re all ready to
+                        tackle
                         this great project. Let&#39;s smash some Brand Concept &amp; Design!</p>
 
                     </div>
@@ -1032,7 +1014,8 @@
                       <span data-filter-by="text">3 days ago</span>
                     </div>
                     <div class="chat-item-body" data-filter-by="text">
-                      <p>Roger that boss! <a href="">@Ravi</a> and I have already started gathering some stuff for the
+                      <p>Roger that boss! <a href="">@Ravi</a> and I have already started gathering some stuff for
+                        the
                         mood boards, excited to start! &#x1f525;</p>
 
                     </div>
@@ -1079,7 +1062,8 @@
                       <span data-filter-by="text">Yesterday</span>
                     </div>
                     <div class="chat-item-body" data-filter-by="text">
-                      <p>Coming along nicely, we&#39;ve got a draft for the client questionnaire completed, take a look!
+                      <p>Coming along nicely, we&#39;ve got a draft for the client questionnaire completed, take a
+                        look!
                         &#x1f913;</p>
 
                     </div>
@@ -1105,7 +1089,8 @@
                       <span data-filter-by="text">2 hours ago</span>
                     </div>
                     <div class="chat-item-body" data-filter-by="text">
-                      <p>Great start guys, I&#39;ve added some notes to the task. We may need to make some adjustments
+                      <p>Great start guys, I&#39;ve added some notes to the task. We may need to make some
+                        adjustments
                         to the last couple of items - but no biggie!</p>
 
                     </div>

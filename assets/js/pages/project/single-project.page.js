@@ -11,6 +11,7 @@ parasails.registerPage('single-project', {
     completeModelOpen: false,
     deleteModelOpen: false,
     projectdeleteModelOpen :false,
+    statusChangeModelOpen:false,
     taskName: true,
     taskNameTxt: false,
     projectDetailsLbl: true,
@@ -31,6 +32,7 @@ parasails.registerPage('single-project', {
       startDate: '',
       dueDate: '',
       project: '',
+      status:'',
 
     },
     formErrors: {},
@@ -225,14 +227,14 @@ parasails.registerPage('single-project', {
       // _.remove(this.facilities, { id: this.selectedMovie, });
       // Close the modal.
       // this.selectedLevyArr = undefined;
-      this.deleteModelOpen = false;
+      this.completeModelOpen = false;
       this.cloudError = '';
       location.reload(true);
     },
 
-    closeDeleteModal: function () {
+    closeCompleteModal: function () {
       // this.selectedMovie = undefined;
-      this.deleteModelOpen = false;
+      this.completeModelOpen = false;
       this.cloudError = '';
       location.reload(true);
     },
@@ -343,6 +345,43 @@ parasails.registerPage('single-project', {
       this.projectdeleteModelOpen = false;
       this.cloudError = '';
     },
+
+
+    handleParsingChangeStatusForm: function () {
+      console.log(this.formData.project);
+      return {
+
+        projId: this.formData.project,
+        status: this.formData.status,
+
+      };
+    },
+
+    makeChangeProjectStatus: async function (id) {
+
+      this.formData.project = id;
+      console.log(this.formData.project);
+
+      this.statusChangeModelOpen = true;
+      console.log('Clicked Note #' + this.formData.project);
+      // this.selectedMovie = _.find(this.movies, { id: this.selectedLevyArr });
+      // }
+    },
+
+    submittedChangeStatusForm: function () {
+
+      this.statusChangeModelOpen = false;
+      this.cloudError = '';
+      location.reload(true);
+
+    },
+
+    closeStatusModal: function () {
+      // this.selectedMovie = undefined;
+      this.statusChangeModelOpen = false;
+      this.cloudError = '';
+    },
+
 
     changeFileInput: function (files) {
 

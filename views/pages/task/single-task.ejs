@@ -223,9 +223,15 @@
           <div class="col-lg-11 col-xl-10">
             <div class="page-header">
               <h1 v-if="taskNamelbl" @click="editTaskName(task.id)">{{task.name}}</h1>
+              
+              <div class="row border rounded border-primary"
+              style="margin-left: 2px; margin-right: 3px; padding: 10px 0px;">
+              <div class="col mr-auto text-right">
 
-              <button @click="removeTask(task.id)" style="margin-left: 800px;" type="button"
+              <button @click="removeTask(task.id)"  type="button"
                 class="btn btn-outline-danger"><i class="fa fa-trash"></i> &nbsp;Delete this task</button>
+                </div>
+                </div>
               <hr><br>
               <div v-if="taskNameTxt">
                 <ajax-form action="edittaskname" :syncing.sync="syncing" :cloud-error.sync="cloudError"
@@ -275,8 +281,14 @@
                 </div>
               </small>
               <div>
-                <div class="progress">
-                  <div class="progress-bar bg-success" style="width:42%;"></div>
+                <div class="progress" v-if="task.status == 'Completed'">
+                  <div class="progress-bar bg-success" style="width:100%;"></div>
+                </div>
+                <div class="progress" v-if="task.status == 'Pending'">
+                  <div class="progress-bar bg-warning" style="width:70%;"></div>
+                </div>
+                <div class="progress" v-if="task.status == 'Beginning'">
+                  <div class="progress-bar bg-danger" style="width:5%;"></div>
                 </div>
                 <div class="d-flex justify-content-between text-small">
                   <div class="d-flex align-items-center">
@@ -338,7 +350,8 @@
                 <hr>
                 <div class="card-body" data-filter-by="text">
                   <p>{{note.description}}</p><br>
-                  <div style="width: 100px; height: 100px;"><font style="font-size: 50px; margin-left: 40px;"><i class="fa fa-file-image-o"></i></font><br><div style="margin-left: 7px;"><button class="btn btn-secondary">Download</button></div></div>
+          
+                  <div style="width: 100px; height: 100px;" v-if="note.taskAttachment"><font style="font-size: 50px; margin-left: 40px;"><i class="fa fa-file-image-o"></i></font><br><div style="margin-left: 7px;"><button class="btn btn-secondary">Download</button></div></div>
                 </div>
              
               </div>

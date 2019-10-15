@@ -81,6 +81,7 @@ module.exports.routes = {
   'DELETE /api/v1/task/removetask':                   { action: 'task/removetask' },
   'DELETE /api/v1/project/removeproject':             { action: 'project/removeproject' },
   'POST /api/v1/task/newattchment':                   { action: 'task/newattchment' },
+  'POST /api/v1/project/makechangestatus':            { action: 'project/makechangestatus' },
 
   
 
