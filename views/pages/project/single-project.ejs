@@ -302,13 +302,13 @@
                 </button>
               </div>
               <div>
-                <div class="progress" v-if="project.status == '100%'">
+                <div class="progress" v-if="project.status == 'Done'">
                   <div class="progress-bar bg-success" style="width:100%;"></div>
                 </div>
-                <div class="progress" v-if="project.status == '75%'">
+                <div class="progress" v-if="project.status == 'WorkingOnIt'">
                   <div class="progress-bar bg-warning" style="width:70%;"></div>
                 </div>
-                <div class="progress" v-if="project.status == '10%'">
+                <div class="progress" v-if="project.status == 'Beginning'">
                   <div class="progress-bar bg-danger" style="width:5%;"></div>
                 </div>
                 <div class="d-flex justify-content-between text-small">
